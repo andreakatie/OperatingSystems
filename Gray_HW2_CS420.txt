@@ -1,0 +1,203 @@
+Script started on Tue 01 Oct 2019 01:48:12 AM MST
+#=======================================================================#
+                  Embry Riddle Aeronautical University         
+#=======================================================================#
+  HOSTNAME = prclab1.erau.edu  
+  LOCATION = Prescott                      
+  USER     = graya17                      
+  UPTIME   = 153 days, 21 hours, 27, 4 users minutes  
+  IP       = 172.19.241.11  
+  OS       = Red Hat Enterprise Linux Server release 7.7 (Maipo)  
+  ARCH     = x86_64                     
+  KERNEL   = 3.10.0-957.5.1.el7.x86_64                   
+  Date     = Tue Oct  1 01:48:12 MST 2019                   
+  CPUCORES = 6                                     CPU_AVG  = 0%
+  MEMORY (total) = 7803 Mb                         MEM_AVG  = 12%
+  SWAP   (total) = 4091 Mb                         SWAP_AVG = 8%  
+  LOAD AVERAGE   = 0.10, 0.09, 0.07                      
+#=======================================================================#
+
+
+graya17@prclab1 Operating_Systems]$ cat Gray_HW2_v1.c
+/*
+    Author: Andrea Gray
+    Assignment: Operating Systems CS420 Homework 2
+    File Description:
+        This file has the main thread of the program create, but not execute a second thread.
+*/
+
+#include <pthread.h>   // for POSIX functions like pthread_xxxx
+#include <errno.h>      // for error handling like perror() and strerror()
+#include <stdio.h>      // for I/O functions like printf()
+#include <sys/types.h>  // for data types used in threads like pthread_t
+#include <string.h>     // for string manipulations and in this file for strerror specifically
+#include <unistd.h>     // for declarations that compromise the POSIX OS like NULL
+
+static void * secondThread(void *arg) {
+    printf("Hi, I'm the second thread. My PID is %d and my TID is %lu\n\n", getpid(), pthread_self());
+}
+
+int main(int argc, char * argv[]) {
+    printf("\n\nmain thread here; pid is %d, tid is %lu\n\n", getpid(), pthread_self());
+    pthread_t thread;
+    int error = pthread_create(&thread, NULL, secondThread, NULL);
+    if (error != 0) {
+        printf(" Damn: at line %d, %s", __LINE__, strerror(error)); // prints the error since pthread_create does not set errno and perror won't work
+    }
+    else {
+        printf("main succesfully created a new thread with TID of %lu\n\n\n", thread);
+    }
+    return 0;
+}
+[graya17@prclab1 Operating_Systems]$ 
+[graya17@prclab1 Operating_Systems]$ gcc -lpthread -o Gray_HW2_v1 Gray_HW2_v1.c
+[graya17@prclab1 Operating_Systems]$ a.out
+
+
+main thread here; pid is 53094, tid is 140265020905280
+
+main: succesfully created a new thread with TID of 140265012565760
+
+    second thread here, my tid is 140265012565760 but I'm still in process 53094,
+        I recieved a 'B' when I was created
+
+main: second thread has terminated, main will now exit.
+
+
+[graya17@prclab1 Operating_Systems]$ cat Gray_HW2_v2.c
+/*
+    Author: Andrea Gray
+    Assignment: Operating Systems CS420 Homework 2
+    File Description:
+        This file demonstrates the successful execution of the second thread.
+*/
+
+#include <pthread.h>   // for POSIX functions like pthread_xxxx
+#include <errno.h>      // for error handling like perror() and strerror()
+#include <stdio.h>      // for I/O functions like printf()
+#include <sys/types.h>  // for data types used in threads like pthread_t
+#include <string.h>     // for string manipulations and in this file for strerror specifically
+#include <unistd.h>     // for declarations that compromise the POSIX OS like NULL
+
+static void * secondThread(void *arg) {
+    printf("    second thread here, my tid is %lu but I'm still in process %d\n\n", pthread_self(), getpid());
+}
+
+int main(int argc, char * argv[]) {
+    printf("\n\nmain thread here; pid is %d, tid is %lu\n\n", getpid(), pthread_self());
+    pthread_t thread;
+    int error = pthread_create(&thread, NULL, secondThread, NULL);
+    if (error != 0) {
+        printf(" Damn: at line %d, %s", __LINE__, strerror(error)); // prints the error since pthread_create does not set errno and perror won't work
+    }
+    else {
+        printf("main: succesfully created a new thread with TID of %lu\n\n", thread);
+    }
+    int joinError = pthread_join(thread, NULL);
+    if (joinError != 0) { // error occurred in joining with terminated thread
+        perror("oopsy, my pthread_join call failed"); // prints specified string along with UNIX error message
+    }
+    else {
+        printf("main: second thread has terminated, main will now exit.\n\n\n");
+    }
+    return 0;
+}
+[graya17@prclab1 Operating_Systems]$ 
+[graya17@prclab1 Operating_Systems]$ gcc -lpthread -o Gray_HW2_v2 Gray_HW2_v2.c
+[graya17@prclab1 Operating_Systems]$ a.out
+
+
+main thread here; pid is 53238, tid is 140422562043712
+
+main: succesfully created a new thread with TID of 140422553704192
+
+    second thread here, my tid is 140422553704192 but I'm still in process 53238,
+        I recieved a 'B' when I was created
+
+main: second thread has terminated, main will now exit.
+
+
+[graya17@prclab1 Operating_Systems]$ cat Gray_HW2_v3.c
+/*
+    Author: Andrea Gray
+    Assignment: Operating Systems CS420 Homework 2
+    File Description:
+        This file demonstrates that the main thread can pass a variable into the second thread.
+*/
+
+#include <pthread.h>   // for POSIX functions like pthread_xxxx
+#include <errno.h>      // for error handling like perror() and strerror()
+#include <stdio.h>      // for I/O functions like printf()
+#include <sys/types.h>  // for data types used in threads like pthread_t
+#include <string.h>     // for string manipulations and in this file for strerror specifically
+#include <unistd.h>     // for declarations that compromise the POSIX OS like NULL
+
+void * secondThread(void *_arg) {
+    char *arg = (char *) _arg;
+    printf("    second thread here, my tid is %lu but I'm still in process %d,\n", pthread_self(), getpid());
+    printf("        I recieved a '%s' when I was created\n\n", arg);
+}
+
+int main(int argc, const char * argv[]) {
+    printf("\n\nmain thread here; pid is %d, tid is %lu\n\n", getpid(), pthread_self());
+    pthread_t thread;
+    int error;
+    char arg = 'B';
+    error = pthread_create(&thread, NULL, secondThread, &arg);
+    if (error != 0) {
+        printf(" Damn: at line %d, %s", __LINE__, strerror(error)); // prints the error since pthread_create does not set errno and perror won't work
+    }
+    else {
+        printf("main: succesfully created a new thread with TID of %lu\n\n", thread);
+    }
+    error = pthread_join(thread, NULL);
+    if (error != 0) { // error occurred in joining with terminated thread
+        perror("oopsy, my pthread_join call failed"); // prints specified string along with UNIX error message
+    }
+    else {
+        printf("main: second thread has terminated, main will now exit.\n\n\n");
+    }
+    return 0;
+}
+[graya17@prclab1 Operating_Systems]$ gcc -lpthread -o Gray_HW2_v3 Gray_HW2_v3.c
+[graya17@prclab1 Operating_Systems]$ a.out
+
+
+main thread here; pid is 53436, tid is 140689132652352
+
+main: succesfully created a new thread with TID of 140689124312832
+
+    second thread here, my tid is 140689124312832 but I'm still in process 53436,
+        I recieved a 'B' when I was created
+
+main: second thread has terminated, main will now exit.
+
+
+[graya17@prclab1 Operating_Systems]$ exit
+exit
+
+Script done on Tue 01 Oct 2019 01:52:07 AM MST
+
+---------------------------------------------------------------------------
+
+Script appended on Tue 01 Oct 2019 02:00:03 AM MST
+
+Appendages: 
+			- Code was cleaned up for submission. The only thing removed where back spaces and awkward symbols from MobaXTerm.
+			  Nothing else was added or removed.
+			- Citations, as seen below. These are the sources that aided in this code's development. 
+			
+	Citations:
+	
+	[1]		https://linux.die.net/man/3/pthread_create
+	[2]		https://linux.die.net/man/3/pthread_self
+	[3]		https://en.wikipedia.org/wiki/POSIX_Threads
+	[4]		https://linux.die.net/man/3/pthread_join
+	[5]		http://ultra.pr.erau.edu/~jaffem/classes/cs420/cs420_reference_materials/strerror.htm
+	[6]		https://www.cs.cmu.edu/afs/cs/academic/class/15492-f07/www/pthreads.html
+	[7]		https://www.geeksforgeeks.org/pthread_self-c-example/
+	[8]		https://pubs.opengroup.org/onlinepubs/009695399/functions/pthread_join.html
+	[9]		http://www.cse.cuhk.edu.hk/~ericlo/teaching/os/lab/9-PThread/Pass.html
+	[10]	https://w3.cs.jmu.edu/kirkpams/OpenCSF/Books/cs361/html/POSIXArgs.html
+	
+Script done on Tue 01 Oct 2019 02:05:32 AM MST

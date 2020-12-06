@@ -1,0 +1,94 @@
+Script started on Sat 19 Oct 2019 12:19:29 AM MST
+#=======================================================================#
+                  Embry Riddle Aeronautical University         
+#=======================================================================#
+  HOSTNAME = prclab1.erau.edu  
+  LOCATION = Prescott                      
+  USER     = graya17                      
+  UPTIME   = 171 days, 19 hours, 59, 5 users minutes  
+  IP       = 172.19.241.11  
+  OS       = Red Hat Enterprise Linux Server release 7.7 (Maipo)  
+  ARCH     = x86_64                     
+  KERNEL   = 3.10.0-957.5.1.el7.x86_64                   
+  Date     = Sat Oct 19 00:19:29 MST 2019                   
+  CPUCORES = 6                                  CPU_AVG  = 0%
+  MEMORY (total) = 7803 Mb                      MEM_AVG  = 13%
+  SWAP (total)   = 4091 Mb                      SWAP_AVG = 5%  
+  LOAD AVERAGE  = 0.16, 0.13, 0.09                      
+#=======================================================================#[0m
+
+             UNAUTHORIZED ACCESS TO THIS SYSTEM IS PROHIBITED.
+Access to this system is restricted to authorized users only. Unauthorized
+access, use, or modification of this system, or any data stored therein is
+strictly prohibited by University policies and applicable law.
+
+ ** If you are not authorized to access this system, exit immediately! **
+
+Users of this system expressly consent to activity monitoring. Unauthorized
+users may be subject to administrative, criminal, or other legal action.
+
+graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ cat Gray_HW3.c
+
+#include <pthread.h>    // for POSIX functions like pthread_xxxx
+#include <errno.h>      // for error handling like perror() and strerror()
+#include <stdio.h>      // for I/O functions like printf()
+#include <sys/types.h>  // for data types used in threads like pthread_t
+#include <string.h>     // for string manipulations and in this file for strerror specifically
+#include <unistd.h>     // for declarations that compromise the POSIX OS like NULL
+
+int userInput = 0;		// global variable to cease main and second thread from spinning
+
+void * secondThread() {
+    printf("\n    Second Thread: My TID is %lu, still in process %d;\n", pthread_self(), getpid());
+    printf("        I'm about to spin until main enters a non-zero value into the shared variable.\n");
+	while (userInput == 0) {
+	}
+	printf("    Second Thread: Main has set the second variable to %d. I will now set it back to 0 and exit\n", userInput);
+    userInput = 0;
+    return 0;
+}
+
+int main(int argc, const char * argv[]) {
+  printf("\nMain: My PID is %d, TID is %lu\n", getpid(), pthread_self());
+	pthread_t thread;
+	int error;
+	error = pthread_create(&thread, NULL, secondThread, NULL);
+	if (error != 0) {
+		printf("\n\n Damn: at line %d, %s\n\n", __LINE__, strerror(error)); // prints the error 
+	}
+	else {
+		printf("Main: Succesfully created a thread with TID of %lu\n", thread);
+	}
+	
+	printf("Main: Enter a non-zero Integer so that the other thread can get out of its spin loop: ");
+	scanf("%i", &userInput);
+
+	while (userInput != 0) {
+	}
+
+	printf("Main: Second thread has re-zeroed the variable, so I am done.\n\n");
+		
+	if (userInput != 0) { // error occurred in joining with terminated thread
+		perror("\n\nWell damn, the second thread failed.\n\n"); // prints error message
+	}
+	else {
+	}
+	return 0;
+ 
+}
+graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ gcc -pthread Gray_HW3.c
+graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ a.out
+
+Main: My PID is 97542, TID is 139775992297280
+Main: Succesfully created a thread with TID of 139775983957760
+Main: Enter a non-zero Integer so that the other thread can get out of its spin loop: 
+    Second Thread: My TID is 139775983957760, still in process 97542;
+        I'm about to spin until main enters a non-zero value into the shared variable.
+56
+    Second Thread: Main has set the second variable to 56. I will now set it back to 0 and exit
+Main: Second thread has re-zeroed the variable, so I am done.
+
+graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ exit
+exit
+
+Script done on Sat 19 Oct 2019 12:20:07 AM MST

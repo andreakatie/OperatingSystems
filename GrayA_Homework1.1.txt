@@ -1,0 +1,93 @@
+Script started on Mon 16 Sep 2019 02:13:13 PM MST
+[01;34m#=======================================================================#
+[1;36m                  Embry Riddle Aeronautical University         
+[01;34m#=======================================================================#
+[01;37m  HOSTNAME =[1;36m prclab1.erau.edu  
+[01;37m  LOCATION =[01;32m Prescott                      
+[01;37m  USER     =[01;35m graya17                      
+[01;37m  UPTIME   =[01;33m 139 days, 9 hours, 52, 13 users minutes  
+[01;37m  IP       = [2;36m172.19.241.11  
+[01;37m  OS       = [01;31mRed Hat Enterprise Linux Server release 7.7 (Maipo)  
+[01;37m  ARCH     = x86_64                     
+[01;37m  KERNEL   = 3.10.0-957.5.1.el7.x86_64                   
+[01;37m  Date     = Mon Sep 16 14:13:13 MST 2019                   
+[01;34m  CPUCORES = 6 [01;34m                                    CPU_AVG  = 2%
+[021;32m  MEMORY (total) = 7803 Mb     [01;32m                      MEM_AVG  = 11%
+[021;32m  SWAP (total)   = 4091 Mb [01;32m                     SWAP_AVG = 9%  
+[01;37m  LOAD AVERAGE  = [01;35m0.08, 0.08, 0.06                      
+[01;34m#=======================================================================#[0m
+
+             [01;31mUNAUTHORIZED ACCESS TO THIS SYSTEM IS PROHIBITED.
+[01;37mAccess to this system is restricted to authorized users only. Unauthorized
+[01;37maccess, use, or modification of this system, or any data stored therein is
+[01;37mstrictly prohibited by University policies and applicable law.
+
+ [01;31m** [01;33mIf you are not authorized to access this system, exit immediately! [01;31m**
+
+[01;37mUsers of this system expressly consent to activity monitoring. Unauthorized
+[01;37musers may be subject to administrative, criminal, or other legal action.
+
+]0;graya17@prclab1:~/Operating_Systems[?1034h[graya17@prclab1 Operating_Systems]$ gcc F[KGrayReplaceChild2.c
+]0;graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ gcc GrayAndrea_HW11.[K[K.c
+]0;graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ a.out[K[K[K[K[Ka.out
+Parent, my pid is #77543: Spawned child #1 whos pid is 77544
+Parent, my pid is #77543: Spawned child #2 whos pid is 77545
+	I am child #1, my pid is 77544; my parent's pid is 77543
+Parent, my pid is #77543: Spawned child #3 whos pid is 77546
+	I am child #3, my pid is 77546; my parent's pid is 77543
+]0;graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$   Process #77545: Now running program 'GrayReplaceChild2.exe' my parent's pid is 1
+]0;graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ cat GrayReplaceChild2.c
+// Andrea Gray
+// Operating Systems 
+// Homework 1
+// Child Replacement File
+
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+int main(int argc, const char * argv[]) {
+    printf("  Process #%d: Now running program 'GrayReplaceChild2.exe' my parent's pid is %d\n", getpid(), getppid());
+    return 0;
+}]0;graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ cat GrayAndreaH[K_HW1.c
+// Andrea Gray
+// Operating Systems
+// Homework 1
+
+// Main File
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+
+int main(int argc, const char * argv[]) {
+  pid_t parentID = getpid();
+  pid_t childID[4];
+  int childProcessCount = 0;
+
+  for (childProcessCount = 0; childProcessCount < 3; childProcessCount++) {
+    if (getpid() != parentID) {
+      break;
+    }
+    
+    childID[childProcessCount] = fork();
+     
+    if (childID[childProcessCount] == 0) {
+      continue;
+    }
+    
+    printf("Parent, my pid is #%d: Spawned child #%d whos pid is %d\n", parentID, childProcessCount+1, childID[childProcessCount]);
+  }
+		
+  if (getpid() != parentID && childProcessCount != 2) {
+		printf("	I am child #%d, my pid is %d; my parent's pid is %d\n", childProcessCount, getpid(), getppid());
+  }
+  if (childProcessCount == 2) {
+    execv("/home/students/graya17/Operating_Systems/GrayReplaceChild2", NULL);
+  }
+  
+  return 0;
+}]0;graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ exit
+exit
+
+Script done on Mon 16 Sep 2019 02:14:10 PM MST

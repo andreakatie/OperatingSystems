@@ -1,0 +1,51 @@
+Script started on Fri 01 Nov 2019 11:53:02 PM MST
+#=======================================================================#
+                  Embry Riddle Aeronautical University         
+#=======================================================================#
+  HOSTNAME = prclab1.erau.edu  
+  LOCATION = Prescott                      
+  USER     = graya17                      
+  UPTIME   = 185 days, 19 hours, 32, 5 users minutes  
+  IP       = 172.19.241.11  
+  OS       = Red Hat Enterprise Linux Server release 7.7 (Maipo)  
+  ARCH     = x86_64                     
+  KERNEL   = 3.10.0-957.5.1.el7.x86_64                   
+  Date     = Fri Nov  1 23:53:02 MST 2019                   
+  CPUCORES = 6                                  CPU_AVG  = 0%
+  MEMORY (total) = 7803 Mb                      MEM_AVG  = 9%
+  SWAP (total)   = 4091 Mb                      SWAP_AVG = 21%  
+  LOAD AVERAGE  = 0.00, 0.04, 0.11                      
+#=======================================================================
+
+             UNAUTHORIZED ACCESS TO THIS SYSTEM IS PROHIBITED.
+Access to this system is restricted to authorized users only. Unauthorized
+access, use, or modification of this system, or any data stored therein is
+strictly prohibited by University policies and applicable law.
+
+** If you are not authorized to access this system, exit immediately! **
+
+Users of this system expressly consent to activity monitoring. Unauthorized
+users may be subject to administrative, criminal, or other legal action.
+
+graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ gcc -lpthread CS420_HW4_GrayA.c
+graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ a.out
+
+ Main:  Initially, race_point is [0,0]; after creating another thread, main will set it to [1,1]  
+
+     The mutex lock was successful for main's critical section.
+
+
+     The mutex unlock was successful for main's critical section.
+
+     The mutex lock was successful for the second thread's critical section.
+
+     The mutex unlock was successful for the second thread's critical section.
+
+   Second thread terminating after setting race_point to [2,2]  
+
+ Main now done; x=2 and y=2 so there was no race condition
+
+graya17@prclab1:~/Operating_Systems[graya17@prclab1 Operating_Systems]$ exit
+exit
+
+Script done on Fri 01 Nov 2019 11:53:47 PM MST
